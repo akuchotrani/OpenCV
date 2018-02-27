@@ -9,15 +9,22 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-cap = cv2.VideoCapture(0)
+#Using system webcam
+#cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture('Aakash_snow_video.MOV')
 
 
-while True:
+while (cap.isOpened()):
     ret,frame = cap.read()
-    cv2.imshow('frame',frame)
     
-    
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if ret == True:
+        gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+        cv2.imshow('frame',gray)
+        
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    else:
+        print("Video stream ended")
         break
     
 cap.release()
