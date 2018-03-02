@@ -7,7 +7,7 @@ Created on Mon Feb 26 17:27:53 2018
 
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
+
 
 #Using system webcam
 #cap = cv2.VideoCapture(0)
