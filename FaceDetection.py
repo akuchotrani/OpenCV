@@ -14,7 +14,8 @@ eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
 #cap = cv2.VideoCapture(1)
 cap = cv2.VideoCapture('Aakash_snow_video.MOV')
 
-
+img_name_counter = 1
+extension = ".png"
 while True:
     ret,img = cap.read()
     if ret == True:
@@ -28,7 +29,10 @@ while True:
             for(ex,ey,ew,eh) in eyes:
                 cv2.rectangle(roi_color,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
             
+            img_name_counter +=1;
+            img_name = str(img_name_counter) + extension
             crop_img = img[y:y+h, x:x+w]
+            cv2.imwrite(img_name,crop_img)
             cv2.imshow("cropped", crop_img)
 
             
