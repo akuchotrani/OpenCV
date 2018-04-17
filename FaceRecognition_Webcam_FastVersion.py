@@ -13,8 +13,9 @@ import time
 
 
 Image_Capture_Delay_Seconds = 10
+
 img_counter = 0
-def capture_images(name):
+def capture_images(name,top,right,bottom,left):
     print('capture images called')
     global img_counter
     #Resetting the path and names
@@ -26,11 +27,48 @@ def capture_images(name):
     crop_img = frame[top:bottom,left:right]
     
     #giving folder path to store the captured images.
-    path = 'C:/Users/aakash.chotrani/Desktop/OpenCV/FaceRecognitionImages'+'/'+name
+    path = 'C:/Users/aakash.chotrani/Desktop/OpenCV/FaceRecognitionImages' +'/'+name
+    if not os.path.exists(path):
+        os.makedirs(path)
     cv2.imwrite(os.path.join(path,img_name),crop_img)
     img_counter = img_counter + 1
     print(img_counter," ",path+img_name)
-        # Draw a label with a name below the face
+    
+    return path
+
+# Create arrays of known face encodings and their names
+known_face_encodings = [
+#    Aakash_face_encoding,
+#    shivam_face_encoding
+]
+known_face_names = [
+#    "Aakash",
+#    "Shivam"
+]        
+        
+def Train_New_Person(name,face_locations):
+    global known_face_encodings
+    global known_face_names
+    top = face_locations[0][0]
+    right = face_locations[0][1]
+    bottom = face_locations[0][2]
+    left = face_locations[0][3]
+    
+    top *= 4
+    right *= 4
+    bottom *= 4
+    left *= 4
+    
+    path = capture_images(name,top,right,bottom,left)
+    
+    #image counter is increased in the capture image function hence decresasing it and storing in temp
+    temp = img_counter - 1
+    name += str(temp)
+    new_person_face_image = face_recognition.load_image_file(os.path.join(path,name) + '.jpg')
+    new_person_face_encoding = face_recognition.face_encodings(new_person_face_image)[0]
+    
+    known_face_encodings.append(new_person_face_encoding)
+    known_face_names.append(name)
     
 
 # This is a demo of running face recognition on live video from your webcam. It's a little more complicated than the
@@ -48,21 +86,13 @@ video_capture = cv2.VideoCapture(0)
 
 
 # Load a sample picture and learn how to recognize it.
-Aakash_image = face_recognition.load_image_file("Aakash_LinkedIn.jpg")
-Aakash_face_encoding = face_recognition.face_encodings(Aakash_image)[0]
+#Aakash_image = face_recognition.load_image_file("Aakash_LinkedIn.jpg")
+#Aakash_face_encoding = face_recognition.face_encodings(Aakash_image)[0]
 
 shivam_image = face_recognition.load_image_file("shivam.jpg")
 shivam_face_encoding = face_recognition.face_encodings(shivam_image)[0]
 
-# Create arrays of known face encodings and their names
-known_face_encodings = [
-    Aakash_face_encoding,
-    shivam_face_encoding
-]
-known_face_names = [
-    "Aakash",
-    "Shivam"
-]
+
 
 # Initialize some variables
 face_locations = []
@@ -77,6 +107,7 @@ process_this_frame = True
 #ImageCaptureThread.start()
 
 end_time = time.time() + Image_Capture_Delay_Seconds
+unknown_person_counter = 0
 while True:
     # Grab a single frame of video
     ret, frame = video_capture.read()
@@ -97,12 +128,19 @@ while True:
         for face_encoding in face_encodings:
             # See if the face is a match for the known face(s)
             matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-            name = "Unknown"
+            
 
             # If a match was found in known_face_encodings, just use the first one.
             if True in matches:
                 first_match_index = matches.index(True)
                 name = known_face_names[first_match_index]
+            else:
+                name = "Person"+str(unknown_person_counter)
+                Train_New_Person(name,face_locations)
+#                Person_image = face_recognition.load_image_file("Aakash_LinkedIn.jpg")
+#                Aakash_face_encoding = face_recognition.face_encodings(Aakash_image)[0]
+                unknown_person_counter = unknown_person_counter + 1
+                
 
             face_names.append(name)
 
@@ -120,7 +158,7 @@ while True:
         
         #capture image every few seconds
         if(time.time() > end_time):
-            capture_images(name)
+            capture_images(name,top,right,bottom,left)
             end_time = time.time() + Image_Capture_Delay_Seconds
 
         # Draw a box around the face
