@@ -7,6 +7,31 @@ Created on Mon Apr 16 17:14:14 2018
 import face_recognition
 import cv2
 import os
+import time
+
+
+
+
+Image_Capture_Delay_Seconds = 10
+img_counter = 0
+def capture_images(name):
+    print('capture images called')
+    global img_counter
+    #Resetting the path and names
+    img_name = ""
+    path = ""
+    
+    #saving the faces
+    img_name = name+ str(img_counter) + '.jpg'
+    crop_img = frame[top:bottom,left:right]
+    
+    #giving folder path to store the captured images.
+    path = 'C:/Users/aakash.chotrani/Desktop/OpenCV/FaceRecognitionImages'+'/'+name
+    cv2.imwrite(os.path.join(path,img_name),crop_img)
+    img_counter = img_counter + 1
+    print(img_counter," ",path+img_name)
+        # Draw a label with a name below the face
+    
 
 # This is a demo of running face recognition on live video from your webcam. It's a little more complicated than the
 # other example, but it includes some basic performance tweaks to make things run a lot faster:
@@ -17,7 +42,6 @@ import os
 # OpenCV is *not* required to use the face_recognition library. It's only required if you want to run this
 # specific demo. If you have trouble installing it, try any of the other demos that don't require it instead.
 
-# Get a reference to webcam #0 (the default one)
 video_capture = cv2.VideoCapture(0)
 
 
@@ -46,9 +70,13 @@ face_encodings = []
 face_names = []
 process_this_frame = True
 
-img_name = "face_"
-img_counter = 0
 
+#MyScheduler = sched.scheduler(time.time,time.sleep)
+#ImageCaptureThread = Thread(target = timer,args=("First Timer",2,5,"Unknown"))
+#
+#ImageCaptureThread.start()
+
+end_time = time.time() + Image_Capture_Delay_Seconds
 while True:
     # Grab a single frame of video
     ret, frame = video_capture.read()
@@ -83,27 +111,20 @@ while True:
 
     # Display the results
     for (top, right, bottom, left), name in zip(face_locations, face_names):
-        img_name = ""
-        path = ""
+        
         # Scale back up face locations since the frame we detected in was scaled to 1/4 size
         top *= 4
         right *= 4
         bottom *= 4
         left *= 4
+        
+        #capture image every few seconds
+        if(time.time() > end_time):
+            capture_images(name)
+            end_time = time.time() + Image_Capture_Delay_Seconds
 
         # Draw a box around the face
         cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
-        
-        #saving the faces
-        img_name = img_name +name+ str(img_counter) + '.jpg'
-        crop_img = frame[top:bottom,left:right]
-        
-        #giving folder path to store the captured images.
-        path = 'C:/Users/aakash.chotrani/Desktop/OpenCV/FaceRecognitionImages'+'/'+name
-        cv2.imwrite(os.path.join(path,img_name),crop_img)
-        img_counter = img_counter + 1
-        print(img_counter," ",path+img_name)
-        # Draw a label with a name below the face
         cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
         font = cv2.FONT_HERSHEY_DUPLEX
         cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
@@ -112,8 +133,6 @@ while True:
     # Display the resulting image
     cv2.imshow('Video', frame)
     
-    
-
     # Hit 'q' on the keyboard to quit!
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
