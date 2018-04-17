@@ -6,6 +6,7 @@ Created on Mon Apr 16 17:14:14 2018
 """
 import face_recognition
 import cv2
+import os
 
 # This is a demo of running face recognition on live video from your webcam. It's a little more complicated than the
 # other example, but it includes some basic performance tweaks to make things run a lot faster:
@@ -18,6 +19,9 @@ import cv2
 
 # Get a reference to webcam #0 (the default one)
 video_capture = cv2.VideoCapture(0)
+
+
+
 
 # Load a sample picture and learn how to recognize it.
 Aakash_image = face_recognition.load_image_file("Aakash_LinkedIn.jpg")
@@ -42,7 +46,8 @@ face_encodings = []
 face_names = []
 process_this_frame = True
 
-img_name = "face_Aakash.jpg"
+img_name = "face_"
+img_counter = 0
 
 while True:
     # Grab a single frame of video
@@ -78,6 +83,8 @@ while True:
 
     # Display the results
     for (top, right, bottom, left), name in zip(face_locations, face_names):
+        img_name = ""
+        path = ""
         # Scale back up face locations since the frame we detected in was scaled to 1/4 size
         top *= 4
         right *= 4
@@ -88,16 +95,24 @@ while True:
         cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
         
         #saving the faces
+        img_name = img_name +name+ str(img_counter) + '.jpg'
         crop_img = frame[top:bottom,left:right]
-        cv2.imwrite(img_name,crop_img)
-
+        
+        #giving folder path to store the captured images.
+        path = 'C:/Users/aakash.chotrani/Desktop/OpenCV/FaceRecognitionImages'+'/'+name
+        cv2.imwrite(os.path.join(path,img_name),crop_img)
+        img_counter = img_counter + 1
+        print(img_counter," ",path+img_name)
         # Draw a label with a name below the face
         cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
         font = cv2.FONT_HERSHEY_DUPLEX
         cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+        
 
     # Display the resulting image
     cv2.imshow('Video', frame)
+    
+    
 
     # Hit 'q' on the keyboard to quit!
     if cv2.waitKey(1) & 0xFF == ord('q'):
