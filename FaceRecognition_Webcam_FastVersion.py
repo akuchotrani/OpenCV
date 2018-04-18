@@ -121,6 +121,8 @@ def Start_Webcam():
     global process_this_frame
     global unknown_person_counter
     video_capture = cv2.VideoCapture(0)
+    video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1920);
+    video_capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080);
     global frame
     global end_time
     while True:

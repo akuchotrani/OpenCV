@@ -128,11 +128,14 @@ def Start_Webcam():
     global process_this_frame
     global unknown_person_counter
     video_capture = cv2.VideoCapture(0)
+    video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1920);
+    video_capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080);
     global frame
     global end_time
     while True:
         # Grab a single frame of video
-        ret, frame = video_capture.read(1920*1080)
+        ret, frame = video_capture.read()
+
     
         # Resize frame of video to 1/4 size for faster face recognition processing
         #small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
