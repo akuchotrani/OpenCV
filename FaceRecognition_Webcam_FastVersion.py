@@ -10,42 +10,13 @@ import os
 import time
 
 
-known_face_names = [
-#        'Aakash',
-#        'Shivam'
-]
 
-# Create arrays of known face encodings and their names
-known_face_encodings = [
-#    Aakash_face_encoding,
-#    shivam_face_encoding
-]
- 
-def Get_Existing_Directories_Training_Images(path):
-    
-    for root, dirs, files in os.walk(path, topdown=False):    
-        #for each directory that already exists get the name and push it to known faces array.
-        for name in dirs:
-            print(name)
-            known_face_names.append(name)
-            
-            #Go in each directory and get the first image and call Train on the image.
-            #NOTE BUG: Check if there are files in the directory.
-            for rootx, dirsx, filesx in os.walk(os.path.join(root, name), topdown=False):
-                print(filesx)
-                print(os.path.join(root, name)+'/'+filesx[0])
-                imagePath = os.path.join(root, name)+'/'+filesx[0]
-                Train_Known_Person(imagePath)
+#def Print_Directory_Names():
+#    for root, dirs, files in os.walk(top, topdown=False):
+#        for name in dirs:
+#            print (os.path.join(root, name))
 
-def Train_Known_Person(path):
-    global known_face_encodings
-    
-    known_person_face_image = face_recognition.load_image_file(path)
-    known_person_face_encoding = face_recognition.face_encodings(known_person_face_image)[0]
-    
-    #record the encoding
-    known_face_encodings.append(known_person_face_encoding)
-                
+
 
 Image_Capture_Delay_Seconds = 10
 
@@ -71,7 +42,15 @@ def capture_images(name,top,right,bottom,left):
     
     return path
 
-       
+# Create arrays of known face encodings and their names
+known_face_encodings = [
+#    Aakash_face_encoding,
+#    shivam_face_encoding
+]
+known_face_names = [
+#    "Aakash",
+#    "Shivam"
+]        
         
 def Train_New_Person(name,face_locations):
     global known_face_encodings
@@ -97,7 +76,20 @@ def Train_New_Person(name,face_locations):
     known_face_encodings.append(new_person_face_encoding)
     known_face_names.append(name)
     
-    
+
+# This is a demo of running face recognition on live video from your webcam. It's a little more complicated than the
+# other example, but it includes some basic performance tweaks to make things run a lot faster:
+#   1. Process each video frame at 1/4 resolution (though still display it at full resolution)
+#   2. Only detect faces in every other frame of video.
+
+# PLEASE NOTE: This example requires OpenCV (the `cv2` library) to be installed only to read from your webcam.
+# OpenCV is *not* required to use the face_recognition library. It's only required if you want to run this
+# specific demo. If you have trouble installing it, try any of the other demos that don't require it instead.
+
+
+
+
+
 
 # Load a sample picture and learn how to recognize it.
 #Aakash_image = face_recognition.load_image_file("Aakash_LinkedIn.jpg")
@@ -113,6 +105,13 @@ face_locations = []
 face_encodings = []
 face_names = []
 process_this_frame = True
+
+
+#MyScheduler = sched.scheduler(time.time,time.sleep)
+#ImageCaptureThread = Thread(target = timer,args=("First Timer",2,5,"Unknown"))
+#
+#ImageCaptureThread.start()
+
 end_time = time.time() + Image_Capture_Delay_Seconds
 unknown_person_counter = 0
 
@@ -121,8 +120,6 @@ def Start_Webcam():
     global process_this_frame
     global unknown_person_counter
     video_capture = cv2.VideoCapture(0)
-    video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1920);
-    video_capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080);
     global frame
     global end_time
     while True:
@@ -198,14 +195,12 @@ def Start_Webcam():
 
 
 def main():
-    path = 'C:/Users/aakash.chotrani/Desktop/OpenCV/FaceRecognitionImages'
-    Get_Existing_Directories_Training_Images(path)
+#    Print_Directory_Names()
     Start_Webcam()
 
 
 if __name__ == "__main__":
     main()
-
 
 
 
